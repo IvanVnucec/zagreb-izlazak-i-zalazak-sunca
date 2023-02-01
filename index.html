@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,">
+    <title>Izlazak i zalazak Sunca u Zagrebu</title>
+</head>
+
+<body style="display: flex; justify-content: center; text-align: center;">
+    <div style="position: absolute; top: 15%">
+        <h1 style="font-size: 3em;">Izlazak i zalazak Sunca u Zagrebu</h1>
+        <h2 id="date"></h2>
+        <table style="margin-left: auto; margin-right: auto; border-spacing: 100px 0;">
+            <tr>
+                <td>
+                    <h3>Izlazak</h3>
+                </td>
+                <td>
+                    <h3>Zalazak</h3>
+                </td>
+            </tr>
+            <tr>
+                <td id="sunrise"></td>
+                <td id="sunset"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="font-size: 9pt; position: absolute; bottom: 0; margin-bottom: 1em;">Made by: <a
+            href="https://github.com/IvanVnucec">Ivan Vnučec</a>, 2023</div>
+
+    <script>
+        const rising = calculateRisingOrSettingTimeForZagreb(true);
+        const setting = calculateRisingOrSettingTimeForZagreb(false);
+
+        document.getElementById("date").innerHTML = new Date().toLocaleDateString();
+        document.getElementById("sunrise").innerHTML = rising;
+        document.getElementById("sunset").innerHTML = setting;
+
+        function rad2deg(rad) {
+            return rad / Math.PI * 180.0;
+        }
+
+        function deg2rad(deg) {
+            return deg / 180.0 * Math.PI;
+        }
+
+        function sin(deg) {
+            return Math.sin(deg2rad(deg));
+        }
+
+        function cos(deg) {
+            return Math.cos(deg2rad(deg));
+        }
+
+        function tan(deg) {
+            return Math.tan(deg2rad(deg));
+        }
+
+        function asin(len) {
+            return rad2deg(Math.asin(len));
+        }
+
+        function acos(len) {
+            return rad2deg(Math.acos(len));
+        }
+
+        function atan(len) {
+            return rad2deg(Math.atan(len));
+        }
+
+        function calculateRisingOrSettingTimeForZagreb(risingTimeDesired) {
+            // for zagreb
+            const latitude = 45.815399;
+            const longitude = 15.966568;
+            const zenith = 90.8333;
+            const localOffset = +1;
+
+            // date
+            const currentDate = new Date();
+            const day = currentDate.getDate();
+            const month = currentDate.getMonth() + 1;
+            const year = currentDate.getFullYear();
+
+            // 1. first calculate the day of the year
+            const N1 = Math.floor(275. * month / 9.);
+            const N2 = Math.floor((month + 9.) / 12.);
+            const N3 = (1. + Math.floor((year - 4. * Math.floor(year / 4.) + 2.) / 3.));
+            const N = N1 - (N2 * N3) + day - 30.;
+
+            // 2. convert the longitude to hour value and calculate an approximate time
+            const lngHour = longitude / 15.;
+            if (risingTimeDesired) {
+                var t = N + ((6. - lngHour) / 24.);
+            } else {
+                var t = N + ((18. - lngHour) / 24.);
+            }
+
+            // 3. calculate the Sun's mean anomaly
+            const M = (0.9856 * t) - 3.289;
+
+            // 4. calculate the Sun's true longitude
+            var L = M + (1.916 * sin(M)) + (0.020 * sin(2. * M)) + 282.634;
+            L = ((L % 360.0) + 360.0) % 360.0;
+            //NOTE: L potentially needs to be adjusted into the range [0,360) by adding/subtracting 360
+
+            // 5a. calculate the Sun's right ascension
+            var RA = atan(0.91764 * tan(L));
+            RA = ((RA % 360.0) + 360.0) % 360.0;
+
+            // 5b. right ascension value needs to be in the same quadrant as L
+            const Lquadrant = (Math.floor(L / 90.)) * 90.;
+            const RAquadrant = (Math.floor(RA / 90.)) * 90.;
+            RA = RA + (Lquadrant - RAquadrant);
+
+            // 5c. right ascension value needs to be converted into hours
+            RA = RA / 15.;
+
+            // 6. calculate the Sun's declination
+            const sinDec = 0.39782 * sin(L);
+            const cosDec = cos(asin(sinDec));
+
+            // 7a. calculate the Sun's local hour angle
+            const cosH = (cos(zenith) - (sinDec * sin(latitude))) / (cosDec * cos(latitude));
+            if (cosH > 1.) {
+                console.log("the sun never rises on this location (on the specified date)");
+            }
+            if (cosH < -1.) {
+                console.log("the sun never sets on this location (on the specified date)");
+            }
+
+            // 7b. finish calculating H and convert into hours
+            if (risingTimeDesired) {
+                var H = 360. - acos(cosH);
+            } else {
+                var H = acos(cosH);
+            }
+            H = H / 15.;
+
+            // 8. calculate local mean time of rising/setting
+            const T = H + RA - (0.06571 * t) - 6.622;
+
+            // 9. adjust back to UTC
+            var UT = T - lngHour;
+            UT = ((UT % 24.0) + 24.0) % 24.0;
+
+            const UT_hours = Math.trunc(UT);
+            const UT_minutes = Math.trunc(UT % 1.0 * 60.0);
+
+            const date = new Date(Date.UTC(year, month - 1, day, UT_hours, UT_minutes));
+
+            return date.toLocaleString('hr-HR', { timeStyle: "short" });
+        }
+    </script>
+</body>
+
+</html>
