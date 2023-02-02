@@ -1,24 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" style="color-scheme: dark;">
+<html lang="hr" style="color-scheme: dark;">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,">
     <title>Izlazak i zalazak Sunca u Zagrebu</title>
+
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+        }
+
+        .container {
+            position: absolute;
+            top: 8vh;
+            width: 100%;
+        }
+
+        .table {
+            margin: auto;
+            text-align: center;
+            border-spacing: 10vw 0;
+            margin-top: 50px;
+        }
+
+        .reference {
+            position: absolute;
+            bottom: 0;
+            margin-bottom: 20px;
+            font-size: 9pt;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
 </head>
 
-<body style="display: flex; justify-content: center; text-align: center;">
-    <div style="position: absolute; top: 15%">
-        <h1 style="font-size: 3em;">Izlazak i zalazak Sunca u Zagrebu</h1>
-        <h2 id="date"></h2>
-        <table style="margin-left: auto; margin-right: auto; border-spacing: 100px 0;">
+
+
+<body>
+    <div class="container">
+        <h1>Izlazak i zalazak Sunca u Zagrebu</h1>
+        <h3>Datum: <span id="date"></span></h3>
+        <table class="table">
             <tr>
                 <td>
-                    <h3>Izlazak</h3>
+                    <h4>Izlazak</h4>
                 </td>
                 <td>
-                    <h3>Zalazak</h3>
+                    <h4>Zalazak</h4>
                 </td>
             </tr>
             <tr>
@@ -27,14 +61,15 @@
             </tr>
         </table>
     </div>
-    <div style="font-size: 9pt; position: absolute; bottom: 0; margin-bottom: 1em;">Made by: <a
-            href="https://github.com/IvanVnucec">Ivan Vnučec</a>, 2023</div>
+
+    <div class="reference">Made by: <a href="https: //github.com/IvanVnucec">Ivan Vnučec</a>, 2023</div>
 
     <script>
+        document.getElementById("date").innerHTML = new Date().toLocaleDateString();
+
         const rising = calculateRisingOrSettingTimeForZagreb(true);
         const setting = calculateRisingOrSettingTimeForZagreb(false);
 
-        document.getElementById("date").innerHTML = new Date().toLocaleDateString();
         document.getElementById("sunrise").innerHTML = rising;
         document.getElementById("sunset").innerHTML = setting;
 
