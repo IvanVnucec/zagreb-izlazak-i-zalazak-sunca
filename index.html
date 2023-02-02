@@ -68,7 +68,7 @@
         const tomorrowDate = new Date();
         tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
-        document.getElementById("date").innerHTML = tomorrowDate.toLocaleDateString();
+        document.getElementById("date").innerHTML = tomorrowDate.getDate() + "." + (tomorrowDate.getMonth() + 1) + "." + tomorrowDate.getFullYear() + ".";
 
         const rising = calculateRisingOrSettingTimeForZagreb(tomorrowDate, true);
         const setting = calculateRisingOrSettingTimeForZagreb(tomorrowDate, false);
