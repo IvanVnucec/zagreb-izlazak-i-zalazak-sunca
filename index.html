@@ -177,13 +177,13 @@
             const T = H + RA - (0.06571 * t) - 6.622;
 
             // 9. adjust back to UTC
-            var UT = T - lngHour;
+            var UT = T - lngHour + localOffset;
             UT = ((UT % 24.0) + 24.0) % 24.0;
 
             const UT_hours = Math.trunc(UT);
             const UT_minutes = Math.trunc(UT % 1.0 * 60.0);
 
-            const date = new Date(Date.UTC(year, month - 1, day, UT_hours, UT_minutes));
+            const date = new Date(year, month - 1, day, UT_hours, UT_minutes);
 
             return date.toLocaleString('hr-HR', { timeStyle: "short" });
         }
