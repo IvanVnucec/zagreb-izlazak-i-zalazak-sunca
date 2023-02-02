@@ -65,10 +65,13 @@
     <div class="reference">Made by: <a href="https: //github.com/IvanVnucec">Ivan Vnučec</a>, 2023</div>
 
     <script>
-        document.getElementById("date").innerHTML = new Date().toLocaleDateString();
+        const tomorrowDate = new Date();
+        tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
-        const rising = calculateRisingOrSettingTimeForZagreb(true);
-        const setting = calculateRisingOrSettingTimeForZagreb(false);
+        document.getElementById("date").innerHTML = tomorrowDate.toLocaleDateString();
+
+        const rising = calculateRisingOrSettingTimeForZagreb(tomorrowDate, true);
+        const setting = calculateRisingOrSettingTimeForZagreb(tomorrowDate, false);
 
         document.getElementById("sunrise").innerHTML = rising;
         document.getElementById("sunset").innerHTML = setting;
@@ -105,7 +108,7 @@
             return rad2deg(Math.atan(len));
         }
 
-        function calculateRisingOrSettingTimeForZagreb(risingTimeDesired) {
+        function calculateRisingOrSettingTimeForZagreb(date, risingTimeDesired) {
             // for zagreb
             const latitude = 45.815399;
             const longitude = 15.966568;
@@ -113,10 +116,9 @@
             const localOffset = +1;
 
             // date
-            const currentDate = new Date();
-            const day = currentDate.getDate();
-            const month = currentDate.getMonth() + 1;
-            const year = currentDate.getFullYear();
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
 
             // 1. first calculate the day of the year
             const N1 = Math.floor(275. * month / 9.);
@@ -183,9 +185,10 @@
             const UT_hours = Math.trunc(UT);
             const UT_minutes = Math.trunc(UT % 1.0 * 60.0);
 
-            const date = new Date(year, month - 1, day, UT_hours, UT_minutes);
+            const time = new Date(year, month - 1, day, UT_hours, UT_minutes);
+            const timeFormatted = time.toLocaleString('hr-HR', { timeStyle: "short" });
 
-            return date.toLocaleString('hr-HR', { timeStyle: "short" });
+            return timeFormatted;
         }
     </script>
 </body>
